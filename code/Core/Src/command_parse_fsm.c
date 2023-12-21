@@ -12,25 +12,18 @@ void command_parse_fsm (void) {
 	switch (command_parse_state) {
 		case IDLE:
 			// do nothing
-			if (strcmp(command_data, "!RST#") == 0) {
-				command_parse_state = RST;
-
+			if (strstr(buffer, "!RST#") != NULL) {
+				command_data = RST_FLAG;
+				command_flag = 1;
+				memset(buffer, 0, sizeof(buffer));
 			}
 
-			if (strcmp(command_data, "!OK#") == 0){
-				command_parse_state = OK;
-
+			if (strstr(buffer, "!OK#") != NULL){
+				command_data = OK_FLAG;
+				command_flag = 1;
+				memset(buffer, 0, sizeof(buffer));
 			}
 			break;
-		case RST:
-			command_data = "";
-			command_flag = RST_FLAG;
-			command_parse_state = IDLE;
-			break;
-		case OK:
-			command_data = "";
-			command_flag = OK_FLAG;
-			command_parse_state = IDLE;
-			break;
+
 	}
 }

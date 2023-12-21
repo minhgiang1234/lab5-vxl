@@ -11,8 +11,7 @@
 #include "global.h"
 
 #define IDLE 1
-#define RST 2
-#define OK 3
+
 
 
 void command_parse_fsm (void);

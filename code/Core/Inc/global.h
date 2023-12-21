@@ -18,7 +18,7 @@ TIM_HandleTypeDef htim3;
 UART_HandleTypeDef huart2;
 
 int command_flag ;
-char* command_data ;
+int command_data ;
 int buffer_flag ;
 int timer_flag;
 
@@ -27,6 +27,13 @@ int uart_communication_state;
 
 #define RST_FLAG 11
 #define OK_FLAG 12
+#define NO_COMMAND 13
+
+#define MAX_BUFFER_SIZE 30
+uint8_t temp;
+int8_t buffer[ MAX_BUFFER_SIZE ];
+uint8_t index_buffer;
+
 
 void system_init(void);
 

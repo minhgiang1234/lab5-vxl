@@ -12,8 +12,9 @@
 #include <stdio.h>
 
 #define IDLE1 21
-#define SEND_DATA 22
+#define SEND_DATA_1 22
 #define IDLE2 23
+#define SEND_DATA_2 24
 
 uint32_t ADC_value;
 

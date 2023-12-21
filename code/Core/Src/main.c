@@ -42,7 +42,11 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+ADC_HandleTypeDef hadc1;
 
+TIM_HandleTypeDef htim3;
+
+UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
 
@@ -96,6 +100,9 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
   system_init();
+  HAL_TIM_Base_Start_IT(&htim3);
+  HAL_UART_Receive_IT (&huart2 , &temp , 1);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -107,6 +114,7 @@ int main(void)
 	 	 buffer_flag = 0;
 	  }
 	  uart_communication_fsm ();
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -213,6 +221,7 @@ static void MX_TIM3_Init(void)
 
   /* USER CODE END TIM3_Init 0 */
 
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
   TIM_MasterConfigTypeDef sMasterConfig = {0};
   TIM_IC_InitTypeDef sConfigIC = {0};
 
@@ -225,6 +234,15 @@ static void MX_TIM3_Init(void)
   htim3.Init.Period = 799;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim3, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
   if (HAL_TIM_IC_Init(&htim3) != HAL_OK)
   {
     Error_Handler();
@@ -307,18 +325,25 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+int counter = 30;
+
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-	;
+	counter--;
+	if (counter <= 0) {
+		counter = 30;
+		timer_flag = 1;
+	}
 }
 
 void HAL_UART_RxCpltCallback ( UART_HandleTypeDef * huart ){
 	if(huart -> Instance == USART2 ){
-		buffer [index_buffer ++] = temp ;
-		(index_buffer == 30) index_buffer = 0;
-
+		 HAL_UART_Transmit (&huart2 , &temp , 1, 50) ;
+		buffer[index_buffer++] = temp ;
+		if (index_buffer == 30) index_buffer = 0;
 		buffer_flag = 1;
-		HAL_UART_Receive_IT (& huart2 , &temp , 1);
+		HAL_UART_Receive_IT (&huart2 , &temp , 1);
+
 	}
 }
 /* USER CODE END 4 */
