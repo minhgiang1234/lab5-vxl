@@ -22,7 +22,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "global.h"
+#include "command_parse_fsm.h"
+#include "uart_communication_fsm.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -40,11 +42,7 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-ADC_HandleTypeDef hadc1;
 
-TIM_HandleTypeDef htim3;
-
-UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
 
@@ -97,13 +95,18 @@ int main(void)
   MX_TIM3_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-
+  system_init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  if( buffer_flag == 1){
+	     command_parse_fsm();
+	 	 buffer_flag = 0;
+	  }
+	  uart_communication_fsm ();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -217,9 +220,9 @@ static void MX_TIM3_Init(void)
 
   /* USER CODE END TIM3_Init 1 */
   htim3.Instance = TIM3;
-  htim3.Init.Prescaler = 0;
+  htim3.Init.Prescaler = 999;
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim3.Init.Period = 65535;
+  htim3.Init.Period = 799;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_IC_Init(&htim3) != HAL_OK)
@@ -304,7 +307,20 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	;
+}
 
+void HAL_UART_RxCpltCallback ( UART_HandleTypeDef * huart ){
+	if(huart -> Instance == USART2 ){
+		buffer [index_buffer ++] = temp ;
+		(index_buffer == 30) index_buffer = 0;
+
+		buffer_flag = 1;
+		HAL_UART_Receive_IT (& huart2 , &temp , 1);
+	}
+}
 /* USER CODE END 4 */
 
 /**
