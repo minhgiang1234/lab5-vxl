@@ -113,7 +113,7 @@ int main(void)
 	     command_parse_fsm();
 	 	 buffer_flag = 0;
 	  }
-	  uart_communication_fsm ();
+	  uart_communication_fsm();
 
     /* USER CODE END WHILE */
 

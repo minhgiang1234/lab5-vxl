@@ -16,7 +16,6 @@ void uart_communication_fsm(void){
 			case IDLE1:
 				// do nothing
 				if (command_data == RST_FLAG){
-					HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
 					uart_communication_state = SEND_DATA_1;
 				}
 
@@ -40,7 +39,6 @@ void uart_communication_fsm(void){
 				// do nothing
 				if (command_data == OK_FLAG) {
 					uart_communication_state = IDLE1;
-					HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
 					command_data = NO_COMMAND;
 					command_flag = 0;
 				}else if (timer_flag == 1) {
@@ -50,7 +48,7 @@ void uart_communication_fsm(void){
 
 				break;
 			case SEND_DATA_2:
-				sprintf ((char *)str , "\r\n%ld\r\n", 0);
+				sprintf ((char *)str , "\r\n%ld\r\n", ADC_value);
 				HAL_UART_Transmit (&huart2 , str , sizeof(str), 1000);
 
 				uart_communication_state = IDLE2;
